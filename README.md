@@ -17,4 +17,4 @@ Criar uma aplicação básica que permita:
 ## Como executar
 1. Clone o repositório
     ````bash
-    git clone
+    git clone https://github.com/SofiaLeivaPires/Sistema-Raiz.git
