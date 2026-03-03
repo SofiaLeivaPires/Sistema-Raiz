@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Raiz.Data;
 using Raiz.Models;
@@ -17,10 +18,41 @@ public class ProdutoController : Controller
         _context = context;
     }
 
-    public IActionResult Index()
+    public IActionResult Index([FromQuery] ProdutoSearch model)
     {
-        var produtos = _context.Produtos.ToList();
-        return View(produtos);
+        // Query de consulta
+        var query = _context.Produtos.Include(x => x.Categoria).AsNoTracking();
+
+        // Produto
+        if (model.ProdutoId.HasValue && model.ProdutoId > 0)
+            query = query.Where(x => x.ProdutoId == model.ProdutoId);
+
+        // Nome
+        if(!string.IsNullOrEmpty(model.Nome))
+            query = query.Where(x => x.Nome.ToUpper().Contains(model.Nome.ToUpper()));
+
+        // CategoriaID
+        if(model.CategoriaId.HasValue && model.CategoriaId > 0)
+            query = query.Where(x => x.CategoriaId == model.CategoriaId);
+
+        // Preço inicial
+        if(model.PrecoInicial.HasValue && model.PrecoInicial > 0)
+            query = query.Where(x => x.Preco >= model.PrecoInicial);
+
+        // Preço final
+        if(model.PrecoFinal.HasValue && model.PrecoFinal > 0)
+            query = query.Where(x => x.Preco <= model.PrecoFinal);
+
+
+
+        // model.Resultado = _context.Produtos.Include(x => x.Categoria).ToList();
+
+        // Executa pesquisa
+        model.Resultado = query.ToList();
+        // Carrega os dados das categorias para o dropdownlist
+        model.Categorias = LoadDropdownlistCategorias();
+
+        return View(nameof(Index), model);
     }
 
     public IActionResult Create()
