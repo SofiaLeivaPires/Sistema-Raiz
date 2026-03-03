@@ -11,4 +11,7 @@ public class ApplicationDbContext : IdentityDbContext
     {
     }
     public DbSet<Categoria> Categorias { get; set; }
+
+    public DbSet<Produto> Produtos { get; set; }
+
 }
